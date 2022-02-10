@@ -1,0 +1,82 @@
+
+#define led 15             //the pin number of led1
+#define buttonPin 22      // the number of the button 1 pin
+#define buttonPin1 23    // the number of the button 2 pin
+#define led1 21         //the pin number of led2
+int buttonState = 0;
+int buttonState1 = 0;
+const int a = 800;      // declearing length of top wave in signal a 
+const int b = 100;      // declearing length of bottom wave in signal a
+const int c = 13;       // declearing total top wave in signal a
+const int d = 550;      // declearing time for start wave in signal a
+
+void setup()
+ {
+  pinMode(buttonPin, INPUT);    //button 1 pin input
+  pinMode(led,OUTPUT);          //led 1 pin to output
+  pinMode(buttonPin1, INPUT);   // button 2 pin to input 
+  pinMode(led1, OUTPUT);        // led 1 pin to output
+  Serial.begin(9600); // baud rate of serial monitor
+ }
+void zeropulse()
+  { 
+    digitalWrite(led,LOW); 
+    digitalWrite(led1,LOW); 
+  }
+void signala()              //function for Signal a
+ {
+   for(int i=1; i<=c; i++)  // loop that call c times
+    {
+      digitalWrite(led,HIGH);      //turn on led 1
+      int a1=a+50*i;              // add value of 50 in "a" do this untill loop happend and save this value in a1
+      delayMicroseconds(a1);     //call microsecond delay value of a1
+      digitalWrite(led,LOW);   //turn off led 1
+      delayMicroseconds(b);   // microsecond delay "b"
+   //   Serial.print(a1);     // for check the value of a1 in serial monitor
+    }
+   delayMicroseconds(d);  //delay in whole loop at d times
+ }
+void signalb()            //function for Signal b
+  {
+    digitalWrite(led1,HIGH);   //turn on led 2
+    delayMicroseconds(50);    // microsecond delay 50 us
+    digitalWrite(led1,LOW);    //turn on led 2
+  }
+
+void mode1()          //function for Model
+  {
+    for(int m=4; m<=c; m++) // this loop start later after 3 wave 
+     {
+       digitalWrite(led,HIGH);      //turn on led 1
+      int a1=a+50*m;              // add value of 50 in "a" do this untill loop happend and save this value in a1
+      delayMicroseconds(a1);     //call microsecond delay value of a1
+      digitalWrite(led,LOW);   //turn off led 1
+      delayMicroseconds(b);   // microsecond delay "b"
+      Serial.print(a1);     // for check the value of a1 in serial monitor
+    } 
+   delayMicroseconds(d);  //delay in whole loop at d times
+}
+
+void loop()
+  {
+    buttonState = digitalRead(buttonPin);     //reading push button 1
+    buttonState1 = digitalRead(buttonPin1);  // reading push button 2
+   if(buttonState1 == LOW)                  // when button 2 is not pressed
+    {
+      if (buttonState == LOW)              // when button 1 is not pressed 
+        {  
+          signalb();                  //call signal b function
+          signala();                 //call signal a function
+        }
+      else   // when button 1 is  HIGH
+      { 
+        zeropulse(); //do all wave zero
+      }                     
+        
+    }
+   else                           // when button 1 states is HIGH
+    {
+      mode1();              //call model function
+      signalb();            //call signal b function
+    }
+  }
