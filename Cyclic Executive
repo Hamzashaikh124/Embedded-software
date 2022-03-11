@@ -1,0 +1,166 @@
+#include <Ticker.h>            //Ticker library
+#define Signal_led 21         //declear G21 to first led pin
+#define analog_pin 34       //declear G34 to analog pin
+#define error_led 15       //declear G15 to second led  pin
+#define Button_Pin 22     //declear G22 to button pin
+Ticker Task_ticker;   //create Task_ticket as ticker object
+
+/*
+ *Globaly allocate value for running each task in ms
+ *there are 9 task that execute on different time.   
+*/
+int Task_ticker_value1 =12.8;
+int Task_ticker_value2 =200;
+int Task_ticker_value3 =1000.666;
+int Task_ticker_value4 =41.66666;
+int Task_ticker_value5 =41.66666;
+int Task_ticker_value6 = 100;
+int Task_ticker_value7 = 333.333;
+int Task_ticker_value8 = 333.333;
+int Task_ticker_value9 = 5000 ;
+/*
+ * Globaly declear all Task and one cycle function for calling them any where
+ */
+void Task1();
+void Task2();
+void Task3();
+void Task4();
+void Task5();
+void Task6();
+void Task7();
+void Task8();
+void Task9();
+void onecycle();
+
+// int executionsCount = 0;
+int buttonState = 0;   //declear buttonstate int globally so we can use this on any Task
+int error_code = 0;    //declear error_code int globally so we can use this on any Task
+int counter=0;       //declear counter int globally 
+int pressed;        //declear button pressed states int globally
+int potValue = 0; // declear portValue  int globally
+int value=0;    //declear Value variable int globally
+ 
+void setup() //setup function
+ {
+   Serial.begin(115200); //115200 UART for monitoring in serial monitor
+   pinMode(Signal_led, OUTPUT); //signal_led as output
+   pinMode(error_led,OUTPUT);  //error_led as output
+   pinMode(Button_Pin, INPUT); // Button_pin as input
+   Task_ticker.attach_ms(2, onecycle); // attach_ms ticket function call onecyle function in 2 ms time period
+ }
+ 
+void loop() //loop function 
+ {
+ }
+/*
+ * in Task 1 function led is turn on and after 50us it turn off
+ */ 
+void Task1() //Task 1 function 
+ {
+  digitalWrite(Signal_led,HIGH);   //turn on signal_led 
+  delayMicroseconds(50);    // microsecond delay 50 us
+  digitalWrite(Signal_led,LOW);    //turn off Signal_led
+ }
+void Task2() //function of Task 2
+ {
+   buttonState = digitalRead(Button_Pin); //Read button_pin states and save value in Button state variable
+   if (buttonState == HIGH)   //if button is on state         
+      {  
+        pressed=1; // changed pressed variable value
+        Serial.println("Button pressed");  //print buttonpressed on UART
+      }
+  else   
+      { pressed=0; // changed pressed variable value
+        Serial.println("No Button Pressed");  //print NO buttonpressed on UART
+      }       
+ 
+ }
+ 
+void Task3()//Task 3 
+ {
+   Serial.println("Task3  : ");
+ }
+ 
+void Task4() //Task 4 function
+ {
+   potValue = analogRead(analog_pin); //Read analog_pin and save value in portValue variable      
+   Serial.println(potValue); //analog value in serial
+ }
+ 
+void Task5() //Task 5 function
+ {
+   for (int t5=0; t5 < 4; t5 ++) //execute loop 4 time
+    { 
+      value = value + analogRead(analog_pin); //read the 4 value of analog pin and them in value variable
+    }
+   value = value / 4; //take average of 4 added value
+   Serial.println(value); //print avg value in serial
+ }
+ 
+void Task6() //function of Task 6
+ {
+   for(int t6=0; t6<1000; t6++) // execute for loop 1000 times 
+    {
+      __asm__ __volatile__ ("nop");
+    }
+ }
+ 
+void Task7()//function of task 7
+ {
+   int half_of_maximum=1.65; // half of maximum input 
+   /*
+    * read analog pin and check the number is greatr than hlaf value 
+    * if its greater than half print error code 1 
+    * and save the value in error code variable
+    * else print error code 0
+    * and change error code value to 0
+    */
+   if ( analogRead(analog_pin)> half_of_maximum)
+    {
+      error_code = 1;
+      Serial.println("error_code = 1"); }
+   else
+    {
+      error_code = 0;
+      Serial.println(" error_code = 0");  
+    }
+ }
+ /*
+  * in Task 8 if error_code variable is equal to 1  
+  * it turn one led
+  * else turn off led
+  */
+void Task8() 
+ {
+   if(error_code==1)
+    {
+      digitalWrite(error_led,HIGH); 
+    }
+   else
+    {
+      digitalWrite(error_led,LOW); 
+    }
+
+}
+void Task9() //function of Task 9
+ {
+  Serial.print(value); //print value or filter analog input
+  Serial.print(pressed); //print button states
+//Serial.println(frecuency);
+ }
+ 
+void onecycle() //oncycle function which we use in ticker object
+{counter ++; //doo counter ++ every time
+/*
+ * execute until value of counter is mutiplier of Task_ticker_value equal to zero and call task  function
+ */
+ if (counter % Task_ticker_value1==0)Task1(); 
+ if (counter % Task_ticker_value2==0)Task2();
+ if (counter % Task_ticker_value3==0)Task3();
+ if (counter % Task_ticker_value4==0)Task4();
+ if (counter % Task_ticker_value5==0)Task5();
+ if (counter % Task_ticker_value6==0)Task6();
+ if (counter % Task_ticker_value7==0)Task7();
+ if (counter % Task_ticker_value8==0)Task8();
+ if (counter % Task_ticker_value9==0)Task9();
+ }
